@@ -1,28 +1,9 @@
 import Head from "next/head";
 import styles from "@/styles/Home.module.css";
 import dynamic from "next/dynamic";
-import { injectScript } from "@module-federation/nextjs-mf/utilities";
+import { loadRemote } from "@module-federation/runtime";
 
-const isServer = typeof document == undefined;
-
-const remote = injectScript({
-  global: "componentsRemote",
-  url: `http://localhost:3003/_next/static/${
-    isServer ? "ssr" : "chunks"
-  }/remoteEntry.js`,
-});
-const remoteComponent = remote.then((container) =>
-  container.get("./MyComponent").then((componentFactory) => componentFactory())
-);
-const MyComponent = dynamic(() => remoteComponent);
-
-// Error: Hydration failed because the initial UI does not match what was rendered on the server.
-// const MyComponent = dynamic(() => import("componentsremote/MyComponent"), {
-//   ssr: true,
-// });
-
-// Error: Hydration failed because the initial UI does not match what was rendered on the server.
-// const MyComponent = require("componentsremote/MyComponent").default;
+const MyComponent = dynamic(() => loadRemote("componentsremote/MyComponent"));
 
 export default function Home() {
   return (
